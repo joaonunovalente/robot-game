@@ -1,3 +1,5 @@
+import pygame
+
 class Coin:
     def __init__(self, x, y, image, window):
         self.x = x
@@ -12,3 +14,7 @@ class Coin:
     def update(self):
         if self.y < self.window.get_height() - self.image.get_height():
             self.y += self.velocity
+
+    def get_rect(self):
+        return pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
+

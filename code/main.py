@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 import pygame
-
-from coin import Coin
-from door import Door
-from monster import Monster
 from robot import Robot
-from spawn import Spawn
+from spawn import CoinSpawn, MonsterSpawn, DoorSpawn
+from door import Door
 
 class RobotGame:
     def __init__(self):
@@ -14,26 +11,31 @@ class RobotGame:
         self.window_width = 1920
         self.window = pygame.display.set_mode((self.window_width, self.window_height))
         pygame.display.set_caption("Robot Game")
-
         self.load_images()
-
-        # Initialize objects and pass the loaded images
-        self.robot = Robot(self.window_width // 2, self.window_height - self.images["robot"].get_height(), self.images["robot"], self.window)
+        self.robot = Robot(
+            self.window_width // 2,
+            self.window_height - self.images["robot"].get_height(),
+            self.images["robot"],
+            self.window
+        )
         self.coins = []
-
-        # Spawn management
-        self.spawn_counter = 0
-        self.spawn_interval = 500
-        self.counter = 0
-        self.spawn_position = 0
-
+        self.monsters = []
+        self.doors = []
+        self.spawn_coins = CoinSpawn()
+        self.spawn_monsters = MonsterSpawn()
+        self.spawn_doors = DoorSpawn()
+        self.score = 0
+        self.health = 3
+        self.total_coins = 50  # Total coins to collect
+        self.total_health = 3
+        self.font = pygame.font.SysFont('Arial', 30)  # Initialize font for rendering text
         self.main_loop()
 
     def load_images(self):
         self.images = {}
         for name in ["door", "coin", "robot", "monster"]:
             try:
-                self.images[name] = pygame.image.load("assets/" + name + ".png")
+                self.images[name] = pygame.image.load(f"assets/{name}.png")
             except FileNotFoundError:
                 print(f"Error: Could not load image {name}.png")
                 pygame.quit()
@@ -42,7 +44,7 @@ class RobotGame:
     def main_loop(self):
         while True:
             self.check_events()
-            self.generate_coins()
+            self.generate()
             self.update()
             self.draw_window()
 
@@ -50,8 +52,6 @@ class RobotGame:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
-
-            # Keyboard controls
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     self.robot.set_movement("left", True)
@@ -62,55 +62,108 @@ class RobotGame:
                     self.robot.set_movement("left", False)
                 if event.key == pygame.K_RIGHT:
                     self.robot.set_movement("right", False)
-            # Touch/mobile controls
             elif event.type == pygame.FINGERDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                # Get the position of the touch/click
                 if event.type == pygame.FINGERDOWN:
                     x, y = event.x * self.window_width, event.y * self.window_height
                 else:
                     x, y = pygame.mouse.get_pos()
-                # Split the screen into three vertical columns
                 column_width = self.window_width // 3
-                if x < column_width:  # Left column
+                if x < column_width:
                     self.robot.set_movement("left", True)
-                elif x > 2 * column_width:  # Right column
+                elif x > 2 * column_width:
                     self.robot.set_movement("right", True)
-
             elif event.type == pygame.FINGERUP or event.type == pygame.MOUSEBUTTONUP:
-                # Stop movement when finger/mouse is released
                 self.robot.set_movement("left", False)
                 self.robot.set_movement("right", False)
 
+    def generate(self):
+        # Generate coins
+        coin = self.spawn_coins.generate(
+            self.window,
+            self.images["coin"],
+            robot=self.robot
+        )
+        if coin:
+            self.coins.append(coin)
+
+        # Generate monsters
+        monster = self.spawn_monsters.generate(
+            self.window,
+            self.images["monster"],
+            robot=self.robot
+        )
+        if monster:
+            self.monsters.append(monster)
+
+        # Generate doors
+        door = self.spawn_doors.generate(
+            self.window,
+            self.images["door"],
+            robot=self.robot
+        )
+        if door:
+            self.doors.append(door)
+
     def update(self):
+        self.spawn_coins.update()
+        self.spawn_monsters.update()
+        self.spawn_doors.update()
         self.robot.update()
+
+        # Update coins
         self.coins = [coin for coin in self.coins if coin.y + coin.image.get_height() < self.window_height]
-        for coin in self.coins:
+        for coin in self.coins[:]:
             coin.update()
+            if self.robot.get_rect().colliderect(coin.get_rect()):
+                self.coins.remove(coin)
+                self.score += 1
+                print(f"Coin collected! Score: {self.score}")
+
+        # Update monsters
+        self.monsters = [monster for monster in self.monsters if monster.y + monster.image.get_height() < self.window_height]
+        for monster in self.monsters[:]:
+            monster.update()
+            if self.robot.get_rect().colliderect(monster.get_rect()):
+                self.monsters.remove(monster)
+                self.health -= 1
+                print(f"Monster hit! Health: {self.health}")
+                if self.health <= 0:
+                    print("Game Over!")
+                    pygame.quit()
+                    exit()
+
+        # Update doors
+        self.doors = [door for door in self.doors if door.y + door.image.get_height() < self.window_height]
+        for door in self.doors[:]:
+            door.update()
+            if self.robot.get_rect().colliderect(door.get_rect()):
+                self.doors.remove(door)
+                self.health = min(3, self.health + 1)
+                print(f"Health restored! Health: {self.health}")
 
     def draw_window(self):
         self.window.fill((230, 230, 230))
         self.draw_objects()
+
+        # Render coin information
+        coin_text = self.font.render(f"{self.score} / {self.total_coins}", True, (0, 0, 0))
+        self.window.blit(self.images['coin'], (self.window.get_width() - 165, 19))
+        self.window.blit(coin_text, (self.window_width - coin_text.get_width() - 20, 20))  # Position in top-right corner
+
+        door_text = self.font.render(f"{self.health} / {self.total_health}", True, (0, 0, 0))
+        self.window.blit(self.images['door'], (self.window.get_width() - 169, 65))
+        self.window.blit(door_text, (self.window_width - door_text.get_width() - 37, 83)) 
+
         pygame.display.flip()
 
     def draw_objects(self):
         self.robot.draw(self.window)
         for coin in self.coins:
             coin.draw(self.window)
-
-    def generate_coins(self):
-        self.spawn_counter += 1
-
-        if self.spawn_counter >= self.spawn_interval:
-            # Gradually decrease spawn interval, with a reasonable minimum
-            self.spawn_interval = max(30, self.spawn_interval - 5)
-            self.spawn_counter = 0
-
-            # Use robot's position to influence spawn, but keep it controlled
-            robot_x = self.robot.get_position[0]  # Access as a property (no parentheses)
-            # Spawn coins at a fixed offset from the robot's position
-            self.spawn_position = (self.spawn_position + robot_x + 250) % self.window.get_width() - self.images["coin"].get_width()
-
-            self.coins.append(Coin(self.spawn_position, 0, self.images["coin"], self.window))
+        for monster in self.monsters:
+            monster.draw()
+        for door in self.doors:
+            door.draw()
 
 if __name__ == "__main__":
     RobotGame()

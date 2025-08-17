@@ -1,3 +1,5 @@
+import pygame
+
 class Robot:
     def __init__(self, x, y, image, window):
         self.x = x
@@ -21,6 +23,10 @@ class Robot:
 
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
+    
+    def get_rect(self):
+        return pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
+
 
     @property
     def get_position(self):
