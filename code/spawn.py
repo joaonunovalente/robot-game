@@ -1,3 +1,5 @@
+import pygame
+
 from coin import Coin
 from monster import Monster
 from door import Door
@@ -12,12 +14,9 @@ class Spawn:
     def update(self):
         self.spawn_counter += 1
 
-    def _create_object(self, x, y, image, window, **kwargs):
-        raise NotImplementedError("Subclasses must implement this method.")
-
 class CoinSpawn(Spawn):
     def __init__(self):
-        super().__init__(spawn_interval=500, min_spawn_interval=300)
+        super().__init__(spawn_interval=500, min_spawn_interval=200)
         self.spawn_position = 0
 
     def generate(self, window, image, robot, **kwargs):
@@ -28,9 +27,7 @@ class CoinSpawn(Spawn):
             )
             self.spawn_counter = 0
 
-            # Use robot's x position to add variability
-            robot_x = robot.x
-            self.spawn_position = (self.spawn_position * 3 + robot_x + 150) % (window.get_width() - image.get_width())
+            self.spawn_position = (self.spawn_position * 3 + robot.x + 150) % (window.get_width() - image.get_width())
 
             return self._create_object(
                 self.spawn_position,
@@ -57,9 +54,7 @@ class MonsterSpawn(Spawn):
             )
             self.spawn_counter = 0
 
-            # Use robot's x position to add variability
-            robot_x = robot.x
-            self.spawn_position = (self.spawn_position * 2 + robot_x + 200) % (window.get_width() - image.get_width())
+            self.spawn_position = (self.spawn_position * 2 + robot.x + 200) % (window.get_width() - image.get_width())
 
             return self._create_object(
                 self.spawn_position,
@@ -86,9 +81,7 @@ class DoorSpawn(Spawn):
             )
             self.spawn_counter = 0
 
-            # Use robot's x position to add variability
-            robot_x = robot.x
-            self.spawn_position = (self.spawn_position * 2 + robot_x + 250) % (window.get_width() - image.get_width())
+            self.spawn_position = (self.spawn_position * 2 + robot.x + 250) % (window.get_width() - image.get_width())
 
             return self._create_object(
                 self.spawn_position,
@@ -101,3 +94,20 @@ class DoorSpawn(Spawn):
 
     def _create_object(self, x, y, image, window):
         return Door(x, y, image, window)
+
+class Monster:
+    def __init__(self, x, y, image, window):
+        self.x = x
+        self.y = y
+        self.image = image
+        self.window = window
+        self.speed = 1
+
+    def update(self):
+        self.y += self.speed
+
+    def draw(self):
+        self.window.blit(self.image, (self.x, self.y))
+
+    def get_rect(self):
+        return pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())

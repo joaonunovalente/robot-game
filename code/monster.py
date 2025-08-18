@@ -6,10 +6,9 @@ class Monster:
         self.y = y
         self.image = image
         self.window = window
-        self.speed = 1  # Vertical falling speed
+        self.speed = 1
 
     def update(self):
-        # Move downward
         self.y += self.speed
 
     def draw(self):

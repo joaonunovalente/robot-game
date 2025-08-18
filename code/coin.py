@@ -12,8 +12,7 @@ class Coin:
         surface.blit(self.image, (self.x, self.y))
 
     def update(self):
-        if self.y < self.window.get_height() - self.image.get_height():
-            self.y += self.velocity
+        self.y += self.velocity
 
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())

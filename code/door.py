@@ -6,10 +6,10 @@ class Door:
         self.y = y
         self.image = image
         self.window = window
-        self.speed = 2  # Vertical falling speed
+        self.speed = 2
 
     def update(self):
-        self.y += self.speed  # Move downward
+        self.y += self.speed
 
     def draw(self):
         self.window.blit(self.image, (self.x, self.y))
