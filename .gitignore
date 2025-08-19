@@ -1,2 +1,3 @@
 .venv
-code/__pycache__/
+archive/code/__pycache__/
+game/code/build/

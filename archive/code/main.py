@@ -34,7 +34,7 @@ class RobotGame:
         self.images = {}
         for name in ["door", "coin", "robot", "monster"]:
             try:
-                self.images[name] = pygame.image.load(f"assets/{name}.png")
+                self.images[name] = pygame.image.load(f"../assets/{name}.png")
             except FileNotFoundError:
                 print(f"Error: Could not load image {name}.png")
                 pygame.quit()
