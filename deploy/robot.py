@@ -5,29 +5,34 @@ class Robot:
         self.x = x
         self.y = y
         self.image = image
-        self.to_left = False
-        self.to_right = False
         self.window = window
+        self.speed = 600  # pixels per second
+        self.move_left = False
+        self.move_right = False
 
-    def set_movement(self, direction, is_pressed):
+    def set_movement(self, direction, is_moving):
         if direction == "left":
-            self.to_left = is_pressed
-        if direction == "right":
-            self.to_right = is_pressed
+            self.move_left = is_moving
+        elif direction == "right":
+            self.move_right = is_moving
 
-    def update(self):
-        if self.to_left and self.x > 0:
-            self.x -= 5
-        if self.to_right and self.x < self.window.get_width() - self.image.get_width():
-            self.x += 5
+    def update(self, dt):
+        if self.move_left:
+            self.x -= self.speed * dt
+        if self.move_right:
+            self.x += self.speed * dt
+
+        # Keep robot inside window boundaries
+        if self.x < 0:
+            self.x = 0
+        if self.x > self.window.get_width() - self.image.get_width():
+            self.x = self.window.get_width() - self.image.get_width()
 
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
-    
-    def get_rect(self):
-        return pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())
 
-
-    @property
     def get_position(self):
         return self.x, self.y
+
+    def get_rect(self):
+        return pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())

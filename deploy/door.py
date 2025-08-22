@@ -6,10 +6,11 @@ class Door:
         self.y = y
         self.image = image
         self.window = window
-        self.speed = 2
+        self.speed = 200 
 
-    def update(self):
-        self.y += self.speed
+    def update(self, dt):
+        # move down based on time delta
+        self.y += self.speed * dt
 
     def draw(self):
         self.window.blit(self.image, (self.x, self.y))

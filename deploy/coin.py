@@ -5,14 +5,14 @@ class Coin:
         self.x = x
         self.y = y
         self.image = image
-        self.velocity = 1
+        self.speed = 500
         self.window = window
 
     def draw(self, surface):
         surface.blit(self.image, (self.x, self.y))
 
-    def update(self):
-        self.y += self.velocity
+    def update(self, dt):
+        self.y += self.speed * dt
 
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.image.get_width(), self.image.get_height())

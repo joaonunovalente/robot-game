@@ -44,13 +44,6 @@ class RobotGame:
                 pygame.quit()
                 exit()
 
-    def step(self):
-        """Run one frame of the game (safe for async loop)."""
-        self.check_events()
-        self.generate()
-        self.update()
-        self.draw_window()
-
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -93,15 +86,22 @@ class RobotGame:
         if door:
             self.doors.append(door)
 
-    def update(self):
+    def step(self, dt):
+        """Run one frame of the game with delta time (dt)."""
+        self.check_events()
+        self.generate()
+        self.update(dt)
+        self.draw_window()
+
+    def update(self, dt):
         self.spawn_coins.update()
         self.spawn_monsters.update()
         self.spawn_doors.update()
-        self.robot.update()
-
+        self.robot.update(dt)
+        
         # Coin collisions
         for coin in self.coins[:]:
-            coin.update()
+            coin.update(dt)
             if self.robot.get_rect().colliderect(coin.get_rect()):
                 self.coins.remove(coin)
                 self.score += 1
@@ -115,7 +115,7 @@ class RobotGame:
 
         # Monster collisions
         for monster in self.monsters[:]:
-            monster.update()
+            monster.update(dt)
             if self.robot.get_rect().colliderect(monster.get_rect()):
                 self.monsters.remove(monster)
                 self.health -= 1
@@ -126,7 +126,7 @@ class RobotGame:
 
         # Door collisions
         for door in self.doors[:]:
-            door.update()
+            door.update(dt)
             if self.robot.get_rect().colliderect(door.get_rect()):
                 self.doors.remove(door)
                 self.health = min(self.total_health, self.health + 1)
@@ -201,8 +201,8 @@ async def main():
     clock = pygame.time.Clock()
 
     while True:
-        game.step()
-        clock.tick(30)
+        dt = clock.tick(60) / 1000
+        game.step(dt)
         await asyncio.sleep(0)  # yield to pygbag
 
 
