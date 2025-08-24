@@ -4,7 +4,7 @@ from door import Door
 
 class Spawn:
     def __init__(self, spawn_interval=500, min_spawn_interval=300):
-        self.spawn_counter = 0
+        self.spawn_counter = 200
         self.spawn_interval = spawn_interval
         self.min_spawn_interval = min_spawn_interval
         self.spawn_position = 0
@@ -14,7 +14,7 @@ class Spawn:
 
 class CoinSpawn(Spawn):
     def __init__(self):
-        super().__init__(spawn_interval=500, min_spawn_interval=200)
+        super().__init__(spawn_interval=200, min_spawn_interval=150)
         self.spawn_position = 0
 
     def generate(self, window, image, robot, **kwargs):
@@ -41,7 +41,7 @@ class CoinSpawn(Spawn):
 
 class MonsterSpawn(Spawn):
     def __init__(self):
-        super().__init__(spawn_interval=800, min_spawn_interval=400)
+        super().__init__(spawn_interval=300, min_spawn_interval=200)
         self.spawn_position = 300
 
     def generate(self, window, image, robot, **kwargs):
@@ -68,14 +68,14 @@ class MonsterSpawn(Spawn):
 
 class DoorSpawn(Spawn):
     def __init__(self):
-        super().__init__(spawn_interval=5000, min_spawn_interval=600)
+        super().__init__(spawn_interval=3000, min_spawn_interval=1000)
         self.spawn_position = 0
 
     def generate(self, window, image, robot, **kwargs):
         if self.spawn_counter >= self.spawn_interval:
             self.spawn_interval = max(
                 self.min_spawn_interval,
-                self.spawn_interval - 20
+                self.spawn_interval - 200
             )
             self.spawn_counter = 0
 

@@ -5,7 +5,7 @@ class Coin:
         self.x = x
         self.y = y
         self.image = image
-        self.speed = 500
+        self.speed = 250
         self.window = window
 
     def draw(self, surface):

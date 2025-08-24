@@ -6,7 +6,7 @@ class Door:
         self.y = y
         self.image = image
         self.window = window
-        self.speed = 200 
+        self.speed = 400 
 
     def update(self, dt):
         # move down based on time delta
