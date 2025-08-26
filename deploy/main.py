@@ -15,24 +15,13 @@ class RobotGame:
 
         self.load_images()
 
-        self.robot = Robot(
-            self.window_width // 2,
-            self.window_height - self.images["robot"].get_height(),
-            self.images["robot"],
-            self.window
-        )
-
-        self.coins = []
-        self.monsters = []
-        self.doors = []
-        self.spawn_coins = CoinSpawn()
-        self.spawn_monsters = MonsterSpawn()
-        self.spawn_doors = DoorSpawn()
-        self.score = 0
-        self.health = 3
-        self.total_coins = 100
-        self.total_health = 3
+        # Fonts
         self.font = pygame.font.SysFont('Arial', 30)
+        self.big_font = pygame.font.SysFont('Arial', 60)
+
+        # Game state: "menu", "playing", "gameover", "win"
+        self.state = "menu"
+        self.reset_game()
 
     def load_images(self):
         self.images = {}
@@ -44,34 +33,68 @@ class RobotGame:
                 pygame.quit()
                 exit()
 
+    def reset_game(self):
+        """Reset everything for a new game."""
+        self.robot = Robot(
+            self.window_width // 2,
+            self.window_height - self.images["robot"].get_height(),
+            self.images["robot"],
+            self.window
+        )
+        self.coins = []
+        self.monsters = []
+        self.doors = []
+        self.spawn_coins = CoinSpawn()
+        self.spawn_monsters = MonsterSpawn()
+        self.spawn_doors = DoorSpawn()
+        self.score = 0
+        self.health = 3
+        self.total_coins = 100
+        self.total_health = 3
+
     def check_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    self.robot.set_movement("left", True)
-                if event.key == pygame.K_RIGHT:
-                    self.robot.set_movement("right", True)
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT:
-                    self.robot.set_movement("left", False)
-                if event.key == pygame.K_RIGHT:
-                    self.robot.set_movement("right", False)
-            elif event.type in (pygame.FINGERDOWN, pygame.MOUSEBUTTONDOWN):
-                if event.type == pygame.FINGERDOWN:
-                    x, y = event.x * self.window_width, event.y * self.window_height
-                else:
-                    x, y = pygame.mouse.get_pos()
-                column_width = self.window_width // 3
-                if x < column_width:
-                    self.robot.set_movement("left", True)
-                elif x > 2 * column_width:
-                    self.robot.set_movement("right", True)
-            elif event.type in (pygame.FINGERUP, pygame.MOUSEBUTTONUP):
-                self.robot.set_movement("left", False)
-                self.robot.set_movement("right", False)
+
+            if self.state == "playing":
+                # normal gameplay events
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        self.robot.set_movement("left", True)
+                    if event.key == pygame.K_RIGHT:
+                        self.robot.set_movement("right", True)
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT:
+                        self.robot.set_movement("left", False)
+                    if event.key == pygame.K_RIGHT:
+                        self.robot.set_movement("right", False)
+
+            elif self.state in ("menu", "gameover", "win"):
+                # Menu/GameOver/Win controls
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:  # start or restart
+                        self.reset_game()
+                        self.state = "playing"
+                    elif event.key == pygame.K_ESCAPE:  # quit
+                        pygame.quit()
+                        exit()
+
+    def step(self, dt):
+        """Run one frame depending on game state."""
+        self.check_events()
+
+        if self.state == "playing":
+            self.generate()
+            self.update(dt)
+            self.draw_window()
+        elif self.state == "menu":
+            self.draw_menu("Press ENTER to Play")
+        elif self.state == "gameover":
+            self.draw_menu("Game Over - Press ENTER to Restart")
+        elif self.state == "win":
+            self.draw_menu("You Win! - Press ENTER to Play Again")
 
     def generate(self):
         coin = self.spawn_coins.generate(self.window, self.images["coin"], robot=self.robot)
@@ -86,19 +109,12 @@ class RobotGame:
         if door:
             self.doors.append(door)
 
-    def step(self, dt):
-        """Run one frame of the game with delta time (dt)."""
-        self.check_events()
-        self.generate()
-        self.update(dt)
-        self.draw_window()
-
     def update(self, dt):
         self.spawn_coins.update()
         self.spawn_monsters.update()
         self.spawn_doors.update()
         self.robot.update(dt)
-        
+
         # Coin collisions
         for coin in self.coins[:]:
             coin.update(dt)
@@ -106,12 +122,12 @@ class RobotGame:
                 self.coins.remove(coin)
                 self.score += 1
                 if self.score >= self.total_coins:
-                    self.show_popup("You Win!")
+                    self.state = "win"
             elif coin.y >= self.window_height:
                 self.coins.remove(coin)
                 self.health -= 1
                 if self.health <= 0:
-                    self.show_popup("Game Over!")
+                    self.state = "gameover"
 
         # Monster collisions
         for monster in self.monsters[:]:
@@ -120,7 +136,7 @@ class RobotGame:
                 self.monsters.remove(monster)
                 self.health -= 1
                 if self.health <= 0:
-                    self.show_popup("Game Over!")
+                    self.state = "gameover"
             elif monster.y > self.window_height:
                 self.monsters.remove(monster)
 
@@ -135,8 +151,15 @@ class RobotGame:
 
     def draw_window(self):
         self.window.fill((230, 230, 230))
-        self.draw_objects()
+        self.robot.draw(self.window)
+        for coin in self.coins:
+            coin.draw(self.window)
+        for monster in self.monsters:
+            monster.draw()
+        for door in self.doors:
+            door.draw()
 
+        # UI
         coin_text = self.font.render(f"{self.score} / {self.total_coins}", True, (0, 0, 0))
         self.window.blit(self.images['coin'], (self.window.get_width() - 180, 19))
         self.window.blit(coin_text, (self.window_width - coin_text.get_width() - 20, 20))
@@ -147,53 +170,13 @@ class RobotGame:
 
         pygame.display.flip()
 
-    def draw_objects(self):
-        self.robot.draw(self.window)
-        for coin in self.coins:
-            coin.draw(self.window)
-        for monster in self.monsters:
-            monster.draw()
-        for door in self.doors:
-            door.draw()
-
-    def show_popup(self, message):
-        popup_font = pygame.font.SysFont('Arial', 50)
-        button_font = pygame.font.SysFont('Arial', 30)
-
-        popup_surface = pygame.Surface((600, 300))
-        popup_surface.fill((200, 200, 200))
-        popup_rect = popup_surface.get_rect(center=(self.window_width // 2, self.window_height // 2))
-
-        text = popup_font.render(message, True, (0, 0, 0))
-        text_rect = text.get_rect(center=(300, 100))
-        popup_surface.blit(text, text_rect)
-
-        pygame.draw.rect(popup_surface, (100, 100, 100), (200, 180, 200, 60))
-        button_text = button_font.render("Quit", True, (255, 255, 255))
-        button_rect = button_text.get_rect(center=(300, 210))
-        popup_surface.blit(button_text, button_rect)
-
-        self.window.blit(popup_surface, popup_rect)
+    def draw_menu(self, message):
+        """Draw menu or gameover/win screen."""
+        self.window.fill((50, 50, 50))
+        text = self.big_font.render(message, True, (255, 255, 255))
+        rect = text.get_rect(center=(self.window_width//2, self.window_height//2))
+        self.window.blit(text, rect)
         pygame.display.flip()
-
-        waiting = True
-        while waiting:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    if popup_rect.collidepoint(mouse_pos):
-                        x, y = mouse_pos[0] - popup_rect.left, mouse_pos[1] - popup_rect.top
-                        if 200 <= x <= 400 and 180 <= y <= 240:
-                            waiting = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key in (pygame.K_RETURN, pygame.K_ESCAPE):
-                        waiting = False
-
-        pygame.quit()
-        exit()
 
 
 async def main():
@@ -201,7 +184,7 @@ async def main():
     clock = pygame.time.Clock()
 
     while True:
-        dt = clock.tick(60) / 1000
+        dt = clock.tick(60) / 1000  # delta time in seconds
         game.step(dt)
         await asyncio.sleep(0)  # yield to pygbag
 
