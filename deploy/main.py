@@ -171,7 +171,7 @@ class RobotGame:
                 self.doors.remove(door)
 
     def draw_window(self):
-        self.window.fill((150, 150, 230))
+        self.window.fill((135, 206, 235))
         self.robot.draw(self.window)
         for coin in self.coins:
             coin.draw(self.window)
