@@ -47,7 +47,7 @@ class RobotGame:
         self.spawn_coins = CoinSpawn()
         self.spawn_monsters = MonsterSpawn()
         self.spawn_doors = DoorSpawn()
-        self.score = 0
+        self.score = 49
         self.health = 3
         self.total_coins = 50
         self.total_health = 3
@@ -90,11 +90,11 @@ class RobotGame:
             self.update(dt)
             self.draw_window()
         elif self.state == "menu":
-            self.draw_menu("Press ENTER to Play")
+            self.draw_menu("menu", "Press ENTER to Play")
         elif self.state == "gameover":
-            self.draw_menu("Game Over - Press ENTER to Restart")
+            self.draw_menu("gameover", "Game Over - Press ENTER to Restart")
         elif self.state == "win":
-            self.draw_menu("You Win! - Press ENTER to Play Again")
+            self.draw_menu("win", "You Win! - Press ENTER to Play Again")
 
     def generate(self):
         coin = self.spawn_coins.generate(self.window, self.images["coin"], robot=self.robot)
@@ -150,7 +150,7 @@ class RobotGame:
                 self.doors.remove(door)
 
     def draw_window(self):
-        self.window.fill((230, 230, 230))
+        self.window.fill((150, 150, 230))
         self.robot.draw(self.window)
         for coin in self.coins:
             coin.draw(self.window)
@@ -170,9 +170,14 @@ class RobotGame:
 
         pygame.display.flip()
 
-    def draw_menu(self, message):
+    def draw_menu(self, result, message):
         """Draw menu or gameover/win screen."""
-        self.window.fill((50, 50, 50))
+        if result == "win":
+            self.window.fill((50, 200, 50))
+        elif result == "gameover":
+            self.window.fill((200, 50, 50))
+        else:
+            self.window.fill((50, 50, 200))
         text = self.big_font.render(message, True, (255, 255, 255))
         rect = text.get_rect(center=(self.window_width//2, self.window_height//2))
         self.window.blit(text, rect)
