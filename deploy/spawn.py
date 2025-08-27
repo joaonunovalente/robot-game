@@ -14,14 +14,14 @@ class Spawn:
 
 class CoinSpawn(Spawn):
     def __init__(self):
-        super().__init__(spawn_interval=200, min_spawn_interval=150)
+        super().__init__(spawn_interval=200, min_spawn_interval=120)
         self.spawn_position = 0
 
     def generate(self, window, image, robot, **kwargs):
         if self.spawn_counter >= self.spawn_interval:
             self.spawn_interval = max(
                 self.min_spawn_interval,
-                self.spawn_interval - 5
+                self.spawn_interval - 10
             )
             self.spawn_counter = 0
 
@@ -48,7 +48,7 @@ class MonsterSpawn(Spawn):
         if self.spawn_counter >= self.spawn_interval:
             self.spawn_interval = max(
                 self.min_spawn_interval,
-                self.spawn_interval - 10
+                self.spawn_interval - 20
             )
             self.spawn_counter = 0
 

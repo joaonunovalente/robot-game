@@ -49,7 +49,7 @@ class RobotGame:
         self.spawn_doors = DoorSpawn()
         self.score = 0
         self.health = 3
-        self.total_coins = 100
+        self.total_coins = 50
         self.total_health = 3
 
     def check_events(self):
