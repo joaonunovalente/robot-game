@@ -165,7 +165,7 @@ class RobotGame:
         self.window.blit(coin_text, (self.window_width - coin_text.get_width() - 20, 20))
 
         door_text = self.font.render(f"{self.health} / {self.total_health}", True, (0, 0, 0))
-        self.window.blit(self.images['door'], (self.window.get_width() - 184, 65))
+        self.window.blit(self.images['door'], (self.window.get_width() - 177, 75))
         self.window.blit(door_text, (self.window_width - door_text.get_width() - 37, 83))
 
         pygame.display.flip()
