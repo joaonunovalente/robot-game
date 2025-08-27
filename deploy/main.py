@@ -47,7 +47,7 @@ class RobotGame:
         self.spawn_coins = CoinSpawn()
         self.spawn_monsters = MonsterSpawn()
         self.spawn_doors = DoorSpawn()
-        self.score = 49
+        self.score = 0
         self.health = 3
         self.total_coins = 50
         self.total_health = 3
@@ -59,7 +59,7 @@ class RobotGame:
                 exit()
 
             if self.state == "playing":
-                # normal gameplay events
+                # Keyboard movement
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
                         self.robot.set_movement("left", True)
@@ -71,6 +71,21 @@ class RobotGame:
                     if event.key == pygame.K_RIGHT:
                         self.robot.set_movement("right", False)
 
+                # Touch/mouse movement
+                elif event.type in (pygame.FINGERDOWN, pygame.MOUSEBUTTONDOWN):
+                    if event.type == pygame.FINGERDOWN:
+                        x, _ = event.x * self.window_width, event.y * self.window_height
+                    else:
+                        x, _ = pygame.mouse.get_pos()
+                    if x < self.window_width // 2:
+                        self.robot.set_movement("left", True)
+                    else:
+                        self.robot.set_movement("right", True)
+
+                elif event.type in (pygame.FINGERUP, pygame.MOUSEBUTTONUP):
+                    self.robot.set_movement("left", False)
+                    self.robot.set_movement("right", False)
+
             elif self.state in ("menu", "gameover", "win"):
                 # Menu/GameOver/Win controls
                 if event.type == pygame.KEYDOWN:
@@ -81,6 +96,12 @@ class RobotGame:
                         pygame.quit()
                         exit()
 
+                # 👇 NEW: any screen tap/click works like ENTER
+                elif event.type in (pygame.FINGERDOWN, pygame.MOUSEBUTTONDOWN):
+                    self.reset_game()
+                    self.state = "playing"
+
+
     def step(self, dt):
         """Run one frame depending on game state."""
         self.check_events()
@@ -90,7 +111,7 @@ class RobotGame:
             self.update(dt)
             self.draw_window()
         elif self.state == "menu":
-            self.draw_menu("menu", "Press ENTER to Play")
+            self.draw_menu("menu", "Press ENTER or TAP to Play")
         elif self.state == "gameover":
             self.draw_menu("gameover", "Game Over - Press ENTER to Restart")
         elif self.state == "win":
