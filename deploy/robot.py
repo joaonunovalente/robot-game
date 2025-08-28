@@ -1,5 +1,6 @@
 import pygame
 
+
 class Robot:
     def __init__(self, x, y, image, window):
         self.x = x

@@ -1,5 +1,6 @@
 import pygame
 
+
 class Monster:
     def __init__(self, x, y, image, window):
         self.x = x

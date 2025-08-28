@@ -16,8 +16,8 @@ class RobotGame:
         self.load_images()
 
         # Fonts
-        self.font = pygame.font.SysFont('Arial', 30)
-        self.big_font = pygame.font.SysFont('Arial', 60)
+        self.font = pygame.font.SysFont("Arial", 30)
+        self.big_font = pygame.font.SysFont("Arial", 60)
 
         # Game state: "menu", "playing", "gameover", "win"
         self.state = "menu"
@@ -36,10 +36,7 @@ class RobotGame:
     def reset_game(self):
         """Reset everything for a new game."""
         self.robot = Robot(
-            self.window_width // 2,
-            self.window_height - self.images["robot"].get_height(),
-            self.images["robot"],
-            self.window
+            self.window_width // 2, self.window_height - self.images["robot"].get_height(), self.images["robot"], self.window
         )
         self.coins = []
         self.monsters = []
@@ -100,7 +97,6 @@ class RobotGame:
                 elif event.type in (pygame.FINGERDOWN, pygame.MOUSEBUTTONDOWN):
                     self.reset_game()
                     self.state = "playing"
-
 
     def step(self, dt):
         """Run one frame depending on game state."""
@@ -182,11 +178,11 @@ class RobotGame:
 
         # UI
         coin_text = self.font.render(f"{self.score} / {self.total_coins}", True, (0, 0, 0))
-        self.window.blit(self.images['coin'], (self.window.get_width() - 180, 19))
+        self.window.blit(self.images["coin"], (self.window.get_width() - 180, 19))
         self.window.blit(coin_text, (self.window_width - coin_text.get_width() - 20, 20))
 
         door_text = self.font.render(f"{self.health} / {self.total_health}", True, (0, 0, 0))
-        self.window.blit(self.images['door'], (self.window.get_width() - 177, 75))
+        self.window.blit(self.images["door"], (self.window.get_width() - 177, 75))
         self.window.blit(door_text, (self.window_width - door_text.get_width() - 37, 83))
 
         pygame.display.flip()
@@ -200,7 +196,7 @@ class RobotGame:
         else:
             self.window.fill((50, 50, 200))
         text = self.big_font.render(message, True, (255, 255, 255))
-        rect = text.get_rect(center=(self.window_width//2, self.window_height//2))
+        rect = text.get_rect(center=(self.window_width // 2, self.window_height // 2))
         self.window.blit(text, rect)
         pygame.display.flip()
 
