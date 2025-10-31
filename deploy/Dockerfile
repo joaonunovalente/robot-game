@@ -1,14 +1,24 @@
-# Use Python image
-FROM python:3.12-slim
+# ===== Build stage =====
+FROM python:3.12-slim AS build
+
+# Install pygbag (and any other deps you need)
+RUN pip install --no-cache-dir pygbag
 
 # Set working directory
 WORKDIR /app
 
-# Copy the fully built game folder
-COPY build/web ./build/web
+# Copy your game source files into the image
+COPY . .
 
-# Expose port
-EXPOSE 8000
+# Build the game for web
+# This creates the /app/build/web directory
+RUN pygbag --build main.py
 
-# Serve the game
-CMD ["python3", "-m", "http.server", "8000", "--bind", "0.0.0.0", "--directory", "build/web"]
+# ===== Serve stage =====
+FROM nginx:alpine
+
+# Copy built web files from the previous stage
+COPY --from=build /app/build/web /usr/share/nginx/html
+
+# Expose the port Nginx serves on
+EXPOSE 80
