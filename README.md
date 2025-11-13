@@ -57,7 +57,7 @@ docker build -t robot-game .
 ```
 2. Run the Container
 ```bash
-docker run -p 8000:8000 robot-game
+docker run -p 8080:80 robot-game
 ```
 
 The game will now be available at http://localhost:8000
@@ -69,8 +69,10 @@ The Docker image for this project is available on Docker Hub:
 You can pull and run the image directly using:
 ```bash
 docker pull joaonunovalente/robot-game
-docker run -p 8000:8000 joaonunovalente/robot-game
+docker run -p 8080:80 joaonunovalente/robot-game
 ```
+
+Then, access [http://localhost:8080](http://localhost:8080)
 
 ## 🚀 Live Demo
 The game is live and playable at:
