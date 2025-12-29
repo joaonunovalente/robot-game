@@ -1,4 +1,4 @@
-# 🤖 Robot Game  
+# Robot Game  
 
 A simple **pygame-based arcade game** where you control a robot, collect coins, avoid monsters, and use hearts to restore health.  
 The game was built with **pygame**, packaged for the web with **pygbag**, and deployed inside a **Docker container**.  
@@ -18,7 +18,7 @@ The game was built with **pygame**, packaged for the web with **pygbag**, and de
 
 ---
 
-## 🛠️ Installation & Running Locally  
+## Installation & Running Locally  
 
 ### 1. Clone the Repository  
 ```bash
@@ -47,7 +47,7 @@ pygbag main.py
 This will build the web export inside a folder (usually build/web/).
 Open the generated link in your browser to play the game online.
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
 A Dockerfile is included for hosting the game on the web.
 
@@ -62,7 +62,7 @@ docker run -p 8080:80 robot-game
 
 The game will now be available at http://localhost:8000
 
-## 🐳 Docker Hub Image
+## Docker Hub Image
 The Docker image for this project is available on Docker Hub:
 - [DockerHub | JoaoNunoValente/robot-game](https://hub.docker.com/r/joaonunovalente/robot-game)
 
@@ -74,7 +74,7 @@ docker run -p 8080:80 joaonunovalente/robot-game
 
 Then, access [http://localhost:8080](http://localhost:8080)
 
-## 🚀 Live Demo
+## Live Demo
 The game is live and playable at:
 - [robot-game.joaonunovalente.com](http://robot-game.joaonunovalente.com)
 
