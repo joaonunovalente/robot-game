@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Install pygbag & Build the game for web
-RUN pip install --no-cache-dir pygbag && \
+RUN pip install --no-cache-dir pygbag==0.9.2 && \
     pygbag --build main.py
 
 # ===== Serve stage =====
