@@ -20,21 +20,23 @@ The game was built with **pygame**, packaged for the web with **pygbag**, and de
 
 ## Installation & Running Locally  
 
-### 1. Clone the Repository  
+1. Clone the Repository  
 ```bash
 git clone https://github.com/yourusername/robot-game.git
 cd robot-game
 ```
 
-
 2. Install Dependencies
 ```bash
-pip install pygame pygbag
+python3 -m venv .venv
+source .venv/bin/activate
+
+pip install requirements.txt
 ```
 
 3. Run the Game Locally
 ```bash
-python main.py
+cd deploy && python main.py
 ```
 
 4. Running in Browser with pygbag

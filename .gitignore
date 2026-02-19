@@ -1,2 +1,4 @@
 .venv
 game/code/__pycache__/
+deploy/build
+deploy/__pycache__

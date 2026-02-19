@@ -1,6 +1,5 @@
 import pygame
 
-
 class Door:
     def __init__(self, x, y, image, window):
         self.x = x
