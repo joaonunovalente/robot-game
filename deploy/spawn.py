@@ -2,6 +2,7 @@ from coin import Coin
 from monster import Monster
 from door import Door
 
+
 class Spawn:
     def __init__(self, spawn_interval=500, min_spawn_interval=300):
         self.spawn_counter = 200
